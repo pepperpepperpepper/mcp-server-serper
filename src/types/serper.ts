@@ -30,6 +30,14 @@ export interface ISearchParams {
 export type ISearchParamsBatch = ISearchParams[];
 
 /**
+ * Scrape parameters for Serper API.
+ */
+export interface IScrapeParams {
+  url: string;
+  includeMarkdown?: boolean;
+}
+
+/**
  * Knowledge graph entry in search results.
  */
 export interface IKnowledgeGraph {
@@ -91,6 +99,17 @@ export interface ISearchResult {
   peopleAlsoAsk?: IPeopleAlsoAsk[];
   /** Related search queries */
   relatedSearches?: IRelatedSearch[];
+}
+
+/**
+ * Represents the result of a scrape operation from the Serper API.
+ */
+export interface IScrapeResult {
+  text: string;
+  markdown?: string;
+  metadata?: Record<string, string>;
+  jsonld?: Record<string, any>;
+  credits?: number;
 }
 
 /**

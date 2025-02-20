@@ -104,6 +104,26 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
           items: searchInputSchema,
         },
       },
+      {
+        name: "scrape",
+        description:
+          "Tool to scrape a webpage and retrieve the text and, optionally, the markdown content. It will retrieve also the JSON-LD metadata and the head metadata.",
+        inputSchema: {
+          type: "object",
+          properties: {
+            url: {
+              type: "string",
+              description: "The URL of the webpage to scrape.",
+            },
+            includeMarkdown: {
+              type: "boolean",
+              description: "Whether to include markdown content.",
+              default: false,
+            },
+          },
+          required: ["url"],
+        },
+      },
     ],
   };
 });
@@ -170,6 +190,21 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
           {
             type: "text",
             text: JSON.stringify(results, null, 2),
+          },
+        ],
+      };
+    }
+
+    case "scrape": {
+      const url = request.params.arguments?.url as string;
+      const includeMarkdown = request.params.arguments
+        ?.includeMarkdown as boolean;
+      const result = await searchTools.scrape({ url, includeMarkdown });
+      return {
+        content: [
+          {
+            type: "text",
+            text: JSON.stringify(result, null, 2),
           },
         ],
       };

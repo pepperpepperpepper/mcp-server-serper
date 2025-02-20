@@ -4,6 +4,8 @@ import {
   ISearchResult,
   ISearchParamsBatch,
   ISearchResultBatch,
+  IScrapeParams,
+  IScrapeResult,
 } from "../types/serper.js";
 
 /**
@@ -51,6 +53,20 @@ export class SerperSearchTools {
       return result;
     } catch (error) {
       throw new Error(`SearchTool: failed to batch search. ${error}`);
+    }
+  }
+
+  /**
+   * Execute a web scrape operation.
+   * @param params - Scrape parameters
+   * @returns Promise resolving to scrape result
+   */
+  async scrape(params: IScrapeParams): Promise<IScrapeResult> {
+    try {
+      const result = await this.serperClient.scrape(params);
+      return result;
+    } catch (error) {
+      throw new Error(`SearchTool: failed to scrape. ${error}`);
     }
   }
 }

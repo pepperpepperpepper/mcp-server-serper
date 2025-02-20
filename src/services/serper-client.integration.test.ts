@@ -1,5 +1,5 @@
 import { SerperClient } from './serper-client.js';
-import { ISearchParams, ISearchParamsBatch } from '../types/serper.js';
+import { IScrapeParams, ISearchParams, ISearchParamsBatch } from '../types/serper.js';
 import dotenv from 'dotenv';
 dotenv.config();
 
@@ -106,6 +106,29 @@ describe('SerperClient Integration Tests', () => {
     it('should handle empty batch array', async () => {
       const emptyBatch: ISearchParamsBatch = [];
       await expect(client.batchSearch(emptyBatch)).rejects.toThrow();
+    }, 10000);
+  });
+
+  describe('scrape', () => {
+    it('should scrape a webpage successfully', async () => {
+      const params: IScrapeParams = {
+        url: 'https://www.microsoft.com',
+        includeMarkdown: true,
+      };
+
+      const result = await client.scrape(params);
+
+      expect(result).toBeDefined();
+      expect(result.text).toBeDefined();
+      expect(result.markdown).toBeDefined();
+    }, 10000);
+
+    it('should handle error for invalid URL', async () => {
+      const params: IScrapeParams = {
+        url: 'invalid-url',
+      };
+
+      await expect(client.scrape(params)).rejects.toThrow();
     }, 10000);
   });
 
