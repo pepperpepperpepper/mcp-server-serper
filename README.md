@@ -56,8 +56,15 @@ On Windows: `%APPDATA%/Claude/claude_desktop_config.json`
 ```json
 {
   "mcpServers": {
-    "Serper MCP Server": {
-      "command": "/path/to/serper-mcp-server/build/index.js"
+    "serper-search": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "serper-search-scrape-mcp-server"
+      ],
+      "env": {
+        "SERPER_API_KEY": "your_api_key_here"
+      }
     }
   }
 }

@@ -1,11 +1,10 @@
 {
   "name": "serper-search-scrape-mcp-server",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "description": "Serper MCP Server supporting search and webpage scraping",
-  "private": true,
   "type": "module",
   "bin": {
-    "serper-search-scrape-mcp-server": "./build/index.js"
+    "serper-mcp": "./build/index.js"
   },
   "files": [
     "build"
@@ -35,5 +34,20 @@
   },
   "engines": {
     "node": ">=18"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/marcopesani/mcp-server-serper.git"
+  },
+  "keywords": [
+    "mcp",
+    "serper",
+    "search",
+    "scrape",
+    "claude",
+    "claude-desktop",
+    "modelcontextprotocol"
+  ],
+  "author": "Marco Pesani",
+  "license": "MIT"
 }

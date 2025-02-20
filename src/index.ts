@@ -131,7 +131,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
 server.setRequestHandler(CallToolRequestSchema, async (request) => {
   switch (request.params.name) {
     case "google_search": {
-      const q = String(request.params.arguments?.query);
+      const q = String(request.params.arguments?.q);
       const gl = request.params.arguments?.gl as string | undefined;
       const hl = request.params.arguments?.hl as string | undefined;
       const location = request.params.arguments?.location as string | undefined;
