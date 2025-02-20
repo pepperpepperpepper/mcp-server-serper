@@ -1,43 +1,30 @@
 #!/usr/bin/env node
 
 /**
- * This is a template MCP server that implements a simple notes system.
- * It demonstrates core MCP concepts like resources and tools by allowing:
- * - Listing notes as resources
- * - Reading individual notes
- * - Creating new notes via a tool
- * - Summarizing all notes via a prompt
+ * MCP server implementation that provides web search capabilities via Serper API.
  */
 
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import {
   CallToolRequestSchema,
-  ListResourcesRequestSchema,
   ListToolsRequestSchema,
-  ReadResourceRequestSchema,
-  ListPromptsRequestSchema,
-  GetPromptRequestSchema,
 } from "@modelcontextprotocol/sdk/types.js";
+import { SerperClient } from "./services/serper-client.js";
+import { SerperSearchTools } from "./tools/search-tool.js";
+import { ISearchParamsBatch } from "./types/serper.js";
 
-/**
- * Type alias for a note object.
- */
-type Note = { title: string, content: string };
+// Initialize Serper client with API key from environment
+const serperApiKey = process.env.SERPER_API_KEY;
+if (!serperApiKey) {
+  throw new Error("SERPER_API_KEY environment variable is required");
+}
 
-/**
- * Simple in-memory storage for notes.
- * In a real implementation, this would likely be backed by a database.
- */
-const notes: { [id: string]: Note } = {
-  "1": { title: "First Note", content: "This is note 1" },
-  "2": { title: "Second Note", content: "This is note 2" }
-};
+// Create Serper client and search tool
+const serperClient = new SerperClient(serperApiKey);
+const searchTools = new SerperSearchTools(serperClient);
 
-/**
- * Create an MCP server with capabilities for resources (to list/read notes),
- * tools (to create new notes), and prompts (to summarize notes).
- */
+// Create MCP server
 const server = new Server(
   {
     name: "Serper MCP Server",
@@ -45,103 +32,146 @@ const server = new Server(
   },
   {
     capabilities: {
-      resources: {},
       tools: {},
-      prompts: {},
     },
   }
 );
 
 /**
- * Handler for listing available notes as resources.
- * Each note is exposed as a resource with:
- * - A note:// URI scheme
- * - Plain text MIME type
- * - Human readable name and description (now including the note title)
- */
-server.setRequestHandler(ListResourcesRequestSchema, async () => {
-  return {
-    resources: Object.entries(notes).map(([id, note]) => ({
-      uri: `note:///${id}`,
-      mimeType: "text/plain",
-      name: note.title,
-      description: `A text note: ${note.title}`
-    }))
-  };
-});
-
-/**
- * Handler for reading the contents of a specific note.
- * Takes a note:// URI and returns the note content as plain text.
- */
-server.setRequestHandler(ReadResourceRequestSchema, async (request) => {
-  const url = new URL(request.params.uri);
-  const id = url.pathname.replace(/^\//, '');
-  const note = notes[id];
-
-  if (!note) {
-    throw new Error(`Note ${id} not found`);
-  }
-
-  return {
-    contents: [{
-      uri: request.params.uri,
-      mimeType: "text/plain",
-      text: note.content
-    }]
-  };
-});
-
-/**
  * Handler that lists available tools.
- * Exposes a single "create_note" tool that lets clients create new notes.
+ * Exposes a single "webSearch" tool for performing web searches.
  */
 server.setRequestHandler(ListToolsRequestSchema, async () => {
+  // Define input schema for search tool
+  const searchInputSchema = {
+    type: "object",
+    properties: {
+      q: {
+        type: "string",
+        description: "Search query string",
+      },
+      gl: {
+        type: "string",
+        description:
+          "Optional region code for search results in ISO 3166-1 alpha-2 format (e.g., 'us')",
+      },
+      hl: {
+        type: "string",
+        description:
+          "Optional language code for search results in ISO 639-1 format (e.g., 'en')",
+      },
+      location: {
+        type: "string",
+        description:
+          "Optional location for search results (e.g., 'SoHo, New York, United States', 'California, United States')",
+      },
+      num: {
+        type: "number",
+        description: "Number of results to return (default: 10)",
+      },
+      tbs: {
+        type: "string",
+        description:
+          "Time-based search filter ('qdr:h' for past hour, 'qdr:d' for past day, 'qdr:w' for past week, 'qdr:m' for past month, 'qdr:y' for past year)",
+      },
+      page: {
+        type: "number",
+        description: "Page number of results to return (default: 1)",
+      },
+      autocorrect: {
+        type: "boolean",
+        description: "Whether to autocorrect spelling in query",
+      },
+    },
+    required: ["q", "gl", "hl"],
+  };
+
+  // Return list of tools with input schemas
   return {
     tools: [
       {
-        name: "create_note",
-        description: "Create a new note",
+        name: "google_search",
+        description:
+          "Tool to perform web searches via Serper API and retrieve rich results. It is able to retrieve organic search results, people also ask, related searches, and knowledge graph.",
+        inputSchema: searchInputSchema,
+      },
+      {
+        name: "batch_google_search",
+        description:
+          "Tool to perform batch web searches via Serper API and retrieve rich results. It is able to retrieve organic search results, people also ask, related searches, and knowledge graph for each query.",
         inputSchema: {
-          type: "object",
-          properties: {
-            title: {
-              type: "string",
-              description: "Title of the note"
-            },
-            content: {
-              type: "string",
-              description: "Text content of the note"
-            }
-          },
-          required: ["title", "content"]
-        }
-      }
-    ]
+          type: "array",
+          items: searchInputSchema,
+        },
+      },
+    ],
   };
 });
 
 /**
- * Handler for the create_note tool.
- * Creates a new note with the provided title and content, and returns success message.
+ * Handler for the webSearch tool.
+ * Performs a web search using Serper API and returns results.
  */
 server.setRequestHandler(CallToolRequestSchema, async (request) => {
   switch (request.params.name) {
-    case "create_note": {
-      const title = String(request.params.arguments?.title);
-      const content = String(request.params.arguments?.content);
-      if (!title || !content) {
-        throw new Error("Title and content are required");
+    case "google_search": {
+      const q = String(request.params.arguments?.query);
+      const gl = request.params.arguments?.gl as string | undefined;
+      const hl = request.params.arguments?.hl as string | undefined;
+      const location = request.params.arguments?.location as string | undefined;
+      const num = request.params.arguments?.num as number | undefined;
+      const tbs = request.params.arguments?.tbs as
+        | "qdr:h"
+        | "qdr:d"
+        | "qdr:w"
+        | "qdr:m"
+        | "qdr:y"
+        | undefined;
+      const page = request.params.arguments?.page as number | undefined;
+      const autocorrect = request.params.arguments?.autocorrect as
+        | boolean
+        | undefined;
+
+      if (!q || !gl || !hl) {
+        throw new Error(
+          "Search query and region code and language are required"
+        );
       }
 
-      const id = String(Object.keys(notes).length + 1);
-      notes[id] = { title, content };
+      try {
+        const result = await searchTools.search({
+          q,
+          gl,
+          hl,
+          location,
+          num,
+          tbs,
+          page,
+          autocorrect,
+        });
+        return {
+          content: [
+            {
+              type: "text",
+              text: JSON.stringify(result, null, 2),
+            },
+          ],
+        };
+      } catch (error) {
+        throw new Error(`Search failed: ${error}`);
+      }
+    }
 
+    case "batch_google_search": {
+      const queries = request.params.arguments?.queries as ISearchParamsBatch;
+      const results = await searchTools.batchSearch(queries);
       return {
-        content: [{
-          type: "text",
-          text: `Created note ${id}: ${title}`
-        }]
+        content: [
+          {
+            type: "text",
+            text: JSON.stringify(results, null, 2),
+          },
+        ],
       };
     }
 
@@ -151,65 +181,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 });
 
 /**
- * Handler that lists available prompts.
- * Exposes a single "summarize_notes" prompt that summarizes all notes.
- */
-server.setRequestHandler(ListPromptsRequestSchema, async () => {
-  return {
-    prompts: [
-      {
-        name: "summarize_notes",
-        description: "Summarize all notes",
-      }
-    ]
-  };
-});
-
-/**
- * Handler for the summarize_notes prompt.
- * Returns a prompt that requests summarization of all notes, with the notes' contents embedded as resources.
- */
-server.setRequestHandler(GetPromptRequestSchema, async (request) => {
-  if (request.params.name !== "summarize_notes") {
-    throw new Error("Unknown prompt");
-  }
-
-  const embeddedNotes = Object.entries(notes).map(([id, note]) => ({
-    type: "resource" as const,
-    resource: {
-      uri: `note:///${id}`,
-      mimeType: "text/plain",
-      text: note.content
-    }
-  }));
-
-  return {
-    messages: [
-      {
-        role: "user",
-        content: {
-          type: "text",
-          text: "Please summarize the following notes:"
-        }
-      },
-      ...embeddedNotes.map(note => ({
-        role: "user" as const,
-        content: note
-      })),
-      {
-        role: "user",
-        content: {
-          type: "text",
-          text: "Provide a concise summary of all the notes above."
-        }
-      }
-    ]
-  };
-});
-
-/**
  * Start the server using stdio transport.
- * This allows the server to communicate via standard input/output streams.
  */
 async function main() {
   const transport = new StdioServerTransport();
