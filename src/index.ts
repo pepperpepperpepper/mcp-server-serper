@@ -9,10 +9,13 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 import {
   CallToolRequestSchema,
   ListToolsRequestSchema,
+  ListPromptsRequestSchema,
+  GetPromptRequestSchema,
 } from "@modelcontextprotocol/sdk/types.js";
 import { SerperClient } from "./services/serper-client.js";
 import { SerperSearchTools } from "./tools/search-tool.js";
 import { ISearchParamsBatch } from "./types/serper.js";
+import { SerperPrompts } from "./prompts/index.js";
 
 // Initialize Serper client with API key from environment
 const serperApiKey = process.env.SERPER_API_KEY;
@@ -20,9 +23,10 @@ if (!serperApiKey) {
   throw new Error("SERPER_API_KEY environment variable is required");
 }
 
-// Create Serper client and search tool
+// Create Serper client, search tool, and prompts
 const serperClient = new SerperClient(serperApiKey);
 const searchTools = new SerperSearchTools(serperClient);
+const prompts = new SerperPrompts(searchTools);
 
 // Create MCP server
 const server = new Server(
@@ -33,6 +37,7 @@ const server = new Server(
   {
     capabilities: {
       tools: {},
+      prompts: {}
     },
   }
 );
@@ -94,15 +99,6 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
         description:
           "Tool to perform web searches via Serper API and retrieve rich results. It is able to retrieve organic search results, people also ask, related searches, and knowledge graph.",
         inputSchema: searchInputSchema,
-      },
-      {
-        name: "batch_google_search",
-        description:
-          "Tool to perform batch web searches via Serper API and retrieve rich results. It is able to retrieve organic search results, people also ask, related searches, and knowledge graph for each query.",
-        inputSchema: {
-          type: "array",
-          items: searchInputSchema,
-        },
       },
       {
         name: "scrape",
@@ -213,6 +209,16 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
     default:
       throw new Error("Unknown tool");
   }
+});
+
+// Handle prompts/list requests
+server.setRequestHandler(ListPromptsRequestSchema, async () => {
+  return prompts.listPrompts();
+});
+
+// Handle prompts/get requests
+server.setRequestHandler(GetPromptRequestSchema, async (request) => {
+  return prompts.getPrompt(request.params.name, request.params.arguments || {});
 });
 
 /**
