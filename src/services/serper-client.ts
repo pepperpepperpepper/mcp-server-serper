@@ -65,6 +65,10 @@ export class SerperClient implements ISerperClient {
    * @throws Error if API request fails
    */
   async batchSearch(batchParams: ISearchParamsBatch): Promise<ISearchResultBatch> {
+    if (!batchParams.length) {
+      throw new Error('Batch search requires at least one query');
+    }
+    
     try {
       const response = await fetch(`${this.baseUrl}/search`, {
         method: 'POST',
@@ -87,4 +91,4 @@ export class SerperClient implements ISerperClient {
       throw error;
     }
   }
-} 
+}
