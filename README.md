@@ -1,29 +1,29 @@
-# Serper MCP Server MCP Server
+# Serper MCP Server
 
-Serper MCP Server supporting search and webpage scraping
-
-This is a TypeScript-based MCP server that implements a simple notes system. It demonstrates core MCP concepts by providing:
-
-- Resources representing text notes with URIs and metadata
-- Tools for creating new notes
-- Prompts for generating summaries of notes
+A TypeScript-based MCP server that provides web search and webpage scraping capabilities using the Serper API. This server integrates with Claude Desktop to enable powerful web search and content extraction features.
 
 ## Features
 
-### Resources
-- List and access notes via `note://` URIs
-- Each note has a title, content and metadata
-- Plain text mime type for simple content access
-
 ### Tools
-- `create_note` - Create new text notes
-  - Takes title and content as required parameters
-  - Stores note in server state
 
-### Prompts
-- `summarize_notes` - Generate a summary of all stored notes
-  - Includes all note contents as embedded resources
-  - Returns structured prompt for LLM summarization
+- `google_search` - Perform web searches via Serper API
+  - Rich search results including organic results, knowledge graph, "people also ask", and related searches
+  - Supports region and language targeting
+  - Optional parameters for location, pagination, time filters, and autocorrection
+  
+- `batch_google_search` - Execute multiple search queries in a single request
+  - Same capabilities as single search
+  - Efficient batch processing of multiple queries
+  
+- `scrape` - Extract content from web pages
+  - Get plain text and optional markdown content
+  - Includes JSON-LD and head metadata
+  - Preserves document structure
+
+## Requirements
+
+- Node.js >= 18
+- Serper API key (set as `SERPER_API_KEY` environment variable)
 
 ## Development
 
@@ -42,21 +42,37 @@ For development with auto-rebuild:
 npm run watch
 ```
 
+Run tests:
+```bash
+npm test                  # Run all tests
+npm run test:watch       # Run tests in watch mode
+npm run test:coverage    # Run tests with coverage
+npm run test:integration # Run integration tests
+```
+
 ## Installation
 
 To use with Claude Desktop, add the server config:
 
-On MacOS: `~/Library/Application Support/Claude/claude_desktop_config.json`
+On MacOS: `~/Library/Application Support/Claude/claude_desktop_config.json`  
 On Windows: `%APPDATA%/Claude/claude_desktop_config.json`
 
 ```json
 {
   "mcpServers": {
     "Serper MCP Server": {
-      "command": "/path/to/Serper MCP Server/build/index.js"
+      "command": "/path/to/serper-mcp-server/build/index.js"
     }
   }
 }
+```
+
+### Environment Variables
+
+Create a `.env` file in the root directory:
+
+```
+SERPER_API_KEY=your_api_key_here
 ```
 
 ### Debugging
