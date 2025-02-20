@@ -1,4 +1,4 @@
-# Serper MCP Server
+# Serper Search and Scrape MCP Server
 
 A TypeScript-based MCP server that provides web search and webpage scraping capabilities using the Serper API. This server integrates with Claude Desktop to enable powerful web search and content extraction features.
 
@@ -10,10 +10,6 @@ A TypeScript-based MCP server that provides web search and webpage scraping capa
   - Rich search results including organic results, knowledge graph, "people also ask", and related searches
   - Supports region and language targeting
   - Optional parameters for location, pagination, time filters, and autocorrection
-  
-- `batch_google_search` - Execute multiple search queries in a single request
-  - Same capabilities as single search
-  - Efficient batch processing of multiple queries
   
 - `scrape` - Extract content from web pages
   - Get plain text and optional markdown content

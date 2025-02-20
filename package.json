@@ -1,11 +1,11 @@
 {
-  "name": "serper-mcp-server",
+  "name": "serper-search-scrape-mcp-server",
   "version": "0.1.0",
   "description": "Serper MCP Server supporting search and webpage scraping",
   "private": true,
   "type": "module",
   "bin": {
-    "serper-mcp-server": "./build/index.js"
+    "serper-search-scrape-mcp-server": "./build/index.js"
   },
   "files": [
     "build"
