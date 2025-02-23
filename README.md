@@ -46,6 +46,24 @@ npm run test:coverage    # Run tests with coverage
 npm run test:integration # Run integration tests
 ```
 
+### Environment Variables
+
+Create a `.env` file in the root directory:
+
+```
+SERPER_API_KEY=your_api_key_here
+```
+
+### Debugging
+
+Since MCP servers communicate over stdio, debugging can be challenging. We recommend using the [MCP Inspector](https://github.com/modelcontextprotocol/inspector), which is available as a package script:
+
+```bash
+npm run inspector
+```
+
+The Inspector will provide a URL to access debugging tools in your browser.
+
 ## Installation
 
 ### Claude Desktop
@@ -104,23 +122,3 @@ Additional Cline configuration options:
 ```
 SERPER_API_KEY=your_api_key_here npx -y serper-search-scrape-mcp-server
 ```
-
-## Local Development
-
-### Environment Variables
-
-Create a `.env` file in the root directory:
-
-```
-SERPER_API_KEY=your_api_key_here
-```
-
-### Debugging
-
-Since MCP servers communicate over stdio, debugging can be challenging. We recommend using the [MCP Inspector](https://github.com/modelcontextprotocol/inspector), which is available as a package script:
-
-```bash
-npm run inspector
-```
-
-The Inspector will provide a URL to access debugging tools in your browser.
