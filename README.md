@@ -145,3 +145,31 @@ Additional Cline configuration options:
 ```
 env SERPER_API_KEY=your_api_key_here npx -y serper-search-scrape-mcp-server
 ```
+
+### Docker
+
+You can also run the server using Docker. First, build the image:
+
+```bash
+docker build -t mcp-server-serper .
+```
+
+Then run the container with your Serper API key:
+
+```bash
+docker run -e SERPER_API_KEY=your_api_key_here mcp-server-serper
+```
+
+Alternatively, if you have your environment variables in a `.env` file:
+
+```bash
+docker run --env-file .env mcp-server-serper
+```
+
+For development, you might want to mount your source code as a volume:
+
+```bash
+docker run -v $(pwd):/app --env-file .env mcp-server-serper
+```
+
+Note: Make sure to replace `your_api_key_here` with your actual Serper API key.

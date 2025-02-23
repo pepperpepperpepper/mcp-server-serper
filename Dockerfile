@@ -5,15 +5,11 @@ FROM node:18-alpine AS builder
 # Set working directory
 WORKDIR /app
 
-# Copy package.json and package-lock.json
-COPY package.json package-lock.json ./
+# Copy all source files first
+COPY . .
 
-# Install dependencies
-RUN npm install --ignore-scripts
-
-# Copy source code and other necessary files
-COPY src ./src
-COPY tsconfig.json ./
+# Install all dependencies including dev dependencies
+RUN npm ci
 
 # Build the TypeScript files
 RUN npm run build
@@ -24,16 +20,13 @@ FROM node:18-slim AS release
 # Set working directory
 WORKDIR /app
 
-# Copy the built files and necessary resources
+# Copy only the necessary files from builder
 COPY --from=builder /app/build /app/build
 COPY --from=builder /app/package.json /app/package.json
 COPY --from=builder /app/package-lock.json /app/package-lock.json
 
-# Install only production dependencies
-RUN npm ci --omit=dev
-
-# Set environment variable for the Serper API key
-ENV SERPER_API_KEY=your-api-key-here
+# Install only production dependencies without running prepare script
+RUN npm ci --omit=dev --ignore-scripts
 
 # Set environment variable for Node.js
 ENV NODE_ENV=production
