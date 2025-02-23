@@ -48,20 +48,18 @@ npm run test:integration # Run integration tests
 
 ## Installation
 
-To use with Claude Desktop, add the server config:
+### Claude Desktop
 
-On MacOS: `~/Library/Application Support/Claude/claude_desktop_config.json`  
-On Windows: `%APPDATA%/Claude/claude_desktop_config.json`
+Add the server config at:
+- MacOS: `~/Library/Application Support/Claude/claude_desktop_config.json`
+- Windows: `%APPDATA%/Claude/claude_desktop_config.json`
 
 ```json
 {
   "mcpServers": {
     "serper-search": {
       "command": "npx",
-      "args": [
-        "-y",
-        "serper-search-scrape-mcp-server"
-      ],
+      "args": ["-y", "serper-search-scrape-mcp-server"],
       "env": {
         "SERPER_API_KEY": "your_api_key_here"
       }
@@ -69,6 +67,45 @@ On Windows: `%APPDATA%/Claude/claude_desktop_config.json`
   }
 }
 ```
+
+### Cline
+
+1. Open the Cline extension settings
+2. Open "MCP Servers" tab
+3. Click on "Configure MCP Servers"
+4. Add the server config:
+```json
+{
+  "mcpServers": {
+    "github.com/marcopesani/mcp-server-serper": {
+      "command": "npx",
+      "args": ["-y", "serper-search-scrape-mcp-server"],
+      "env": {
+        "SERPER_API_KEY": "your_api_key_here"
+      },
+      "disabled": false,
+      "autoApprove": ["google_search", "scrape"]
+    }
+  }
+}
+```
+
+Additional Cline configuration options:
+- `disabled`: Set to `false` to enable the server
+- `autoApprove`: List of tools that don't require explicit approval for each use
+
+### Cursor
+
+1. Open the Cursor settings
+2. Open "Features" settings
+3. In the "MCP Servers" section, click on "Add new MCP Server"
+4. Choose a name, and select "command" as "Type"
+5. In the "Command" field, enter the following:
+```
+SERPER_API_KEY=your_api_key_here npx -y serper-search-scrape-mcp-server
+```
+
+## Local Development
 
 ### Environment Variables
 
