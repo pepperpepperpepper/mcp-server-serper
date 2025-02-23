@@ -14,7 +14,6 @@ import {
 } from "@modelcontextprotocol/sdk/types.js";
 import { SerperClient } from "./services/serper-client.js";
 import { SerperSearchTools } from "./tools/search-tool.js";
-import { ISearchParamsBatch } from "./types/serper.js";
 import { SerperPrompts } from "./prompts/index.js";
 
 // Initialize Serper client with API key from environment
@@ -176,19 +175,6 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       } catch (error) {
         throw new Error(`Search failed: ${error}`);
       }
-    }
-
-    case "batch_google_search": {
-      const queries = request.params.arguments?.queries as ISearchParamsBatch;
-      const results = await searchTools.batchSearch(queries);
-      return {
-        content: [
-          {
-            type: "text",
-            text: JSON.stringify(results, null, 2),
-          },
-        ],
-      };
     }
 
     case "scrape": {

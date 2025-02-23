@@ -1,5 +1,5 @@
 import { SerperClient } from './serper-client.js';
-import { IScrapeParams, ISearchParams, ISearchParamsBatch } from '../types/serper.js';
+import { IScrapeParams, ISearchParams } from '../types/serper.js';
 import dotenv from 'dotenv';
 dotenv.config();
 
@@ -75,37 +75,6 @@ describe('SerperClient Integration Tests', () => {
       };
 
       await expect(invalidClient.search(params)).rejects.toThrow();
-    }, 10000);
-  });
-
-  describe('batchSearch', () => {
-    it('should perform batch search successfully', async () => {
-      const batchParams: ISearchParamsBatch = [
-        { q: 'artificial intelligence' },
-        { q: 'machine learning', gl: 'us', hl: 'en' },
-      ];
-
-      const results = await client.batchSearch(batchParams);
-
-      expect(Array.isArray(results)).toBe(true);
-      expect(results.length).toBe(batchParams.length);
-
-      // Verify first query results
-      expect(results[0].searchParameters.q).toBe(batchParams[0].q);
-      expect(results[0].organic.length).toBeGreaterThan(0);
-
-      // Verify second query results with optional params
-      expect(results[1].searchParameters).toMatchObject({
-        q: batchParams[1].q,
-        gl: batchParams[1].gl,
-        hl: batchParams[1].hl,
-      });
-      expect(results[1].organic.length).toBeGreaterThan(0);
-    }, 15000);
-
-    it('should handle empty batch array', async () => {
-      const emptyBatch: ISearchParamsBatch = [];
-      await expect(client.batchSearch(emptyBatch)).rejects.toThrow();
     }, 10000);
   });
 

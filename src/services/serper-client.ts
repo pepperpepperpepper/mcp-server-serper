@@ -1,9 +1,7 @@
 import fetch from "node-fetch";
 import {
   ISearchParams,
-  ISearchParamsBatch,
   ISearchResult,
-  ISearchResultBatch,
   IScrapeParams,
   IScrapeResult,
 } from "../types/serper.js";
@@ -14,8 +12,6 @@ import {
 export interface ISerperClient {
   /** Perform a web search using Serper API */
   search(params: ISearchParams): Promise<ISearchResult>;
-  /** Perform a batch web search using Serper API */
-  batchSearch(batchParams: ISearchParamsBatch): Promise<ISearchResultBatch>;
   /** Scrape a URL using Serper API */
   scrape(params: IScrapeParams): Promise<IScrapeResult>;
 }
@@ -62,44 +58,6 @@ export class SerperClient implements ISerperClient {
       }
 
       const data = (await response.json()) as ISearchResult;
-      return data;
-    } catch (error) {
-      console.error("Serper search failed:", error);
-      throw error;
-    }
-  }
-
-  /**
-   * Perform a web search using Serper API.
-   * @param batchParams - Search parameters
-   * @returns Promise resolving to search results
-   * @throws Error if API request fails
-   */
-  async batchSearch(
-    batchParams: ISearchParamsBatch
-  ): Promise<ISearchResultBatch> {
-    if (!batchParams.length) {
-      throw new Error("Batch search requires at least one query");
-    }
-
-    try {
-      const response = await fetch(`${this.baseUrl}/search`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-API-KEY": this.apiKey,
-        },
-        body: JSON.stringify(batchParams),
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(
-          `Serper API error: ${response.status} ${response.statusText} - ${errorText}`
-        );
-      }
-
-      const data = (await response.json()) as ISearchResultBatch;
       return data;
     } catch (error) {
       console.error("Serper search failed:", error);

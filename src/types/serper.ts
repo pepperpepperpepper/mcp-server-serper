@@ -25,11 +25,6 @@ export interface ISearchParams {
 }
 
 /**
- * Batch search parameters for Serper API.
- */
-export type ISearchParamsBatch = ISearchParams[];
-
-/**
  * Scrape parameters for Serper API.
  */
 export interface IScrapeParams {
@@ -111,8 +106,3 @@ export interface IScrapeResult {
   jsonld?: Record<string, any>;
   credits?: number;
 }
-
-/**
- * Batch search result from Serper API.
- */
-export type ISearchResultBatch = ISearchResult[];
