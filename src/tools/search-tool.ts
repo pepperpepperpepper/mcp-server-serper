@@ -2,8 +2,6 @@ import { ISerperClient } from "../services/serper-client.js";
 import {
   ISearchParams,
   ISearchResult,
-  ISearchParamsBatch,
-  ISearchResultBatch,
   IScrapeParams,
   IScrapeResult,
 } from "../types/serper.js";
@@ -37,22 +35,6 @@ export class SerperSearchTools {
       throw new Error(
         `SearchTool: failed to search for "${params.q}". ${error}`
       );
-    }
-  }
-
-  /**
-   * Execute a batch web search query.
-   * @param batchParams - Search parameters
-   * @returns Promise resolving to search results
-   */
-  async batchSearch(
-    batchParams: ISearchParamsBatch
-  ): Promise<ISearchResultBatch> {
-    try {
-      const result = await this.serperClient.batchSearch(batchParams);
-      return result;
-    } catch (error) {
-      throw new Error(`SearchTool: failed to batch search. ${error}`);
     }
   }
 
