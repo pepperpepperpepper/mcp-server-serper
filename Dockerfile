@@ -14,7 +14,6 @@ RUN npm install --ignore-scripts
 # Copy source code and other necessary files
 COPY src ./src
 COPY tsconfig.json ./
-COPY .env ./
 
 # Build the TypeScript files
 RUN npm run build
@@ -32,6 +31,9 @@ COPY --from=builder /app/package-lock.json /app/package-lock.json
 
 # Install only production dependencies
 RUN npm ci --omit=dev
+
+# Set environment variable for the Serper API key
+ENV SERPER_API_KEY=your-api-key-here
 
 # Set environment variable for Node.js
 ENV NODE_ENV=production
