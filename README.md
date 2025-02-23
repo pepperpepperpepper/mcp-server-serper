@@ -10,6 +10,18 @@ A TypeScript-based MCP server that provides web search and webpage scraping capa
   - Rich search results including organic results, knowledge graph, "people also ask", and related searches
   - Supports region and language targeting
   - Optional parameters for location, pagination, time filters, and autocorrection
+  - Supports advanced search operators:
+    - `site`: Limit results to specific domain
+    - `filetype`: Limit to specific file types (e.g., 'pdf', 'doc')
+    - `inurl`: Search for pages with word in URL
+    - `intitle`: Search for pages with word in title
+    - `related`: Find similar websites
+    - `cache`: View Google's cached version of a specific URL
+    - `before`: Date before in YYYY-MM-DD format
+    - `after`: Date after in YYYY-MM-DD format
+    - `exact`: Exact phrase match
+    - `exclude`: Terms to exclude from search results
+    - `or`: Alternative terms (OR operator)
   
 - `scrape` - Extract content from web pages
   - Get plain text and optional markdown content

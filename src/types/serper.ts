@@ -22,6 +22,28 @@ export interface ISearchParams {
   tbs?: "qdr:h" | "qdr:d" | "qdr:w" | "qdr:m" | "qdr:y";
   /** Page number of results */
   page?: number;
+  /** Limit results to specific domain */
+  site?: string;
+  /** Limit to specific file types (e.g., 'pdf', 'doc') */
+  filetype?: string;
+  /** Search for pages with word in URL */
+  inurl?: string;
+  /** Search for pages with word in title */
+  intitle?: string;
+  /** Find similar websites */
+  related?: string;
+  /** View Google's cached version */
+  cache?: string;
+  /** Date before in YYYY-MM-DD format */
+  before?: string;
+  /** Date after in YYYY-MM-DD format */
+  after?: string;
+  /** Exact phrase match */
+  exact?: string;
+  /** Terms to exclude (comma-separated) */
+  exclude?: string;
+  /** Alternative terms (OR operator) (comma-separated) */
+  or?: string;
 }
 
 /**

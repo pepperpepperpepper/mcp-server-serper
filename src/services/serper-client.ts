@@ -34,20 +34,89 @@ export class SerperClient implements ISerperClient {
   }
 
   /**
-   * Perform a web search using Serper API.
-   * @param params - Search parameters
-   * @returns Promise resolving to search results
-   * @throws Error if API request fails
+   * Builds a Google search query string with advanced operators
+   * @param params - Search parameters including advanced operators
+   * @returns Complete query string with operators
+   * @private
    */
+  private buildAdvancedQuery(params: ISearchParams): string {
+    // Normalize spaces in the query
+    let query = params.q.trim().replace(/\s+/g, ' ');
+
+    // Add site restriction
+    if (params.site) {
+      query += ` site:${params.site}`;
+    }
+
+    // Add file type filter
+    if (params.filetype) {
+      query += ` filetype:${params.filetype}`;
+    }
+
+    // Add URL word search
+    if (params.inurl) {
+      query += ` inurl:${params.inurl}`;
+    }
+
+    // Add title word search
+    if (params.intitle) {
+      query += ` intitle:${params.intitle}`;
+    }
+
+    // Add related sites search
+    if (params.related) {
+      query += ` related:${params.related}`;
+    }
+
+    // Add cached page view
+    if (params.cache) {
+      query += ` cache:${params.cache}`;
+    }
+
+    // Add date range filters
+    if (params.before) {
+      query += ` before:${params.before}`;
+    }
+    if (params.after) {
+      query += ` after:${params.after}`;
+    }
+
+    // Add exact phrase match
+    if (params.exact) {
+      query += ` "${params.exact}"`;
+    }
+
+    // Add excluded terms
+    if (params.exclude) {
+      query += params.exclude.split(',').map(term => ` -${term.trim()}`).join('');
+    }
+
+    // Add OR terms
+    if (params.or) {
+      query += ` (${params.or.split(',').map(term => term.trim()).join(' OR ')})`;
+    }
+
+    return query.trim();
+  }
+
   async search(params: ISearchParams): Promise<ISearchResult> {
     try {
+      // Build the advanced query string
+      const queryWithOperators = this.buildAdvancedQuery(params);
+
+      // Create new params object with the enhanced query
+      const enhancedParams = {
+        ...params,
+        q: queryWithOperators,
+      };
+
       const response = await fetch(`${this.baseUrl}/search`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           "X-API-KEY": this.apiKey,
         },
-        body: JSON.stringify(params),
+        body: JSON.stringify(enhancedParams),
       });
 
       if (!response.ok) {
