@@ -132,5 +132,5 @@ Additional Cline configuration options:
 4. Choose a name, and select "command" as "Type"
 5. In the "Command" field, enter the following:
 ```
-SERPER_API_KEY=your_api_key_here npx -y serper-search-scrape-mcp-server
+env SERPER_API_KEY=your_api_key_here npx -y serper-search-scrape-mcp-server
 ```
