@@ -1,4 +1,5 @@
 # Serper Search and Scrape MCP Server
+[![smithery badge](https://smithery.ai/badge/@marcopesani/mcp-server-serper)](https://smithery.ai/server/@marcopesani/mcp-server-serper)
 
 A TypeScript-based MCP server that provides web search and webpage scraping capabilities using the Serper API. This server integrates with Claude Desktop to enable powerful web search and content extraction features.
 
@@ -78,6 +79,14 @@ The Inspector will provide a URL to access debugging tools in your browser.
 
 ## Installation
 
+### Installing via Smithery
+
+To install Serper Search and Scrape for Claude Desktop automatically via [Smithery](https://smithery.ai/server/@marcopesani/mcp-server-serper):
+
+```bash
+npx -y @smithery/cli install @marcopesani/mcp-server-serper --client claude
+```
+
 ### Claude Desktop
 
 Add the server config at:
@@ -104,6 +113,7 @@ Add the server config at:
 2. Open "MCP Servers" tab
 3. Click on "Configure MCP Servers"
 4. Add the server config:
+
 ```json
 {
   "mcpServers": {
@@ -131,6 +141,7 @@ Additional Cline configuration options:
 3. In the "MCP Servers" section, click on "Add new MCP Server"
 4. Choose a name, and select "command" as "Type"
 5. In the "Command" field, enter the following:
+
 ```
 env SERPER_API_KEY=your_api_key_here npx -y serper-search-scrape-mcp-server
 ```
