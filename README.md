@@ -3,6 +3,10 @@
 
 A TypeScript-based MCP server that provides web search and webpage scraping capabilities using the Serper API. This server integrates with Claude Desktop to enable powerful web search and content extraction features.
 
+<a href="https://glama.ai/mcp/servers/5zk327i0pj">
+  <img width="380" height="200" src="https://glama.ai/mcp/servers/5zk327i0pj/badge" alt="serper-search-scrape-mcp-server MCP server" />
+</a>
+
 ## Features
 
 ### Tools
