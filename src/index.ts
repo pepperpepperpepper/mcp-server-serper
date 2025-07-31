@@ -4,28 +4,28 @@
  * MCP server implementation that provides web search capabilities via Serper API.
  */
 
-import { Server } from "@modelcontextprotocol/sdk/server/index.js";
-import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+import { Server } from "@modelcontextprotocol/sdk/server/index.js"
+import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 import {
   CallToolRequestSchema,
   ListToolsRequestSchema,
   ListPromptsRequestSchema,
   GetPromptRequestSchema,
-} from "@modelcontextprotocol/sdk/types.js";
-import { SerperClient } from "./services/serper-client.js";
-import { SerperSearchTools } from "./tools/search-tool.js";
-import { SerperPrompts } from "./prompts/index.js";
+} from "@modelcontextprotocol/sdk/types.js"
+import { SerperClient } from "./services/serper-client.js"
+import { SerperSearchTools } from "./tools/search-tool.js"
+import { SerperPrompts } from "./prompts/index.js"
 
 // Initialize Serper client with API key from environment
-const serperApiKey = process.env.SERPER_API_KEY;
+const serperApiKey = process.env.SERPER_API_KEY
 if (!serperApiKey) {
-  throw new Error("SERPER_API_KEY environment variable is required");
+  throw new Error("SERPER_API_KEY environment variable is required")
 }
 
 // Create Serper client, search tool, and prompts
-const serperClient = new SerperClient(serperApiKey);
-const searchTools = new SerperSearchTools(serperClient);
-const prompts = new SerperPrompts(searchTools);
+const serperClient = new SerperClient(serperApiKey)
+const searchTools = new SerperSearchTools(serperClient)
+const prompts = new SerperPrompts(searchTools)
 
 // Create MCP server
 const server = new Server(
@@ -36,10 +36,10 @@ const server = new Server(
   {
     capabilities: {
       tools: {},
-      prompts: {}
+      prompts: {},
     },
-  }
-);
+  },
+)
 
 /**
  * Handler that lists available tools.
@@ -52,84 +52,88 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
     properties: {
       q: {
         type: "string",
-        description: "Search query string (e.g., 'artificial intelligence', 'climate change solutions')"
+        description: "Search query string (e.g., 'artificial intelligence', 'climate change solutions')",
       },
       gl: {
         type: "string",
-        description: "Optional region code for search results in ISO 3166-1 alpha-2 format (e.g., 'us', 'gb', 'de')"
+        description: "Optional region code for search results in ISO 3166-1 alpha-2 format (e.g., 'us', 'gb', 'de')",
       },
       hl: {
         type: "string",
-        description: "Optional language code for search results in ISO 639-1 format (e.g., 'en', 'es', 'fr')"
+        description: "Optional language code for search results in ISO 639-1 format (e.g., 'en', 'es', 'fr')",
       },
       location: {
         type: "string",
-        description: "Optional location for search results (e.g., 'SoHo, New York, United States', 'California, United States')"
+        description:
+          "Optional location for search results (e.g., 'SoHo, New York, United States', 'California, United States')",
       },
       num: {
         type: "number",
-        description: "Number of results to return (default: 10)"
+        description: "Number of results to return (default: 10)",
       },
       tbs: {
         type: "string",
-        description: "Time-based search filter ('qdr:h' for past hour, 'qdr:d' for past day, 'qdr:w' for past week, 'qdr:m' for past month, 'qdr:y' for past year)"
+        description:
+          "Time-based search filter ('qdr:h' for past hour, 'qdr:d' for past day, 'qdr:w' for past week, 'qdr:m' for past month, 'qdr:y' for past year)",
       },
       page: {
         type: "number",
-        description: "Page number of results to return (default: 1)"
+        description: "Page number of results to return (default: 1)",
       },
       autocorrect: {
         type: "boolean",
-        description: "Whether to autocorrect spelling in query"
+        description: "Whether to autocorrect spelling in query",
       },
       // Advanced search operators
       site: {
         type: "string",
-        description: "Limit results to specific domain (e.g., 'github.com', 'wikipedia.org')"
+        description: "Limit results to specific domain (e.g., 'github.com', 'wikipedia.org')",
       },
       filetype: {
         type: "string",
-        description: "Limit to specific file types (e.g., 'pdf', 'doc', 'xls')"
+        description: "Limit to specific file types (e.g., 'pdf', 'doc', 'xls')",
       },
       inurl: {
         type: "string",
-        description: "Search for pages with word in URL (e.g., 'download', 'tutorial')"
+        description: "Search for pages with word in URL (e.g., 'download', 'tutorial')",
       },
       intitle: {
         type: "string",
-        description: "Search for pages with word in title (e.g., 'review', 'how to')"
+        description: "Search for pages with word in title (e.g., 'review', 'how to')",
       },
       related: {
         type: "string",
-        description: "Find similar websites (e.g., 'github.com', 'stackoverflow.com')"
+        description: "Find similar websites (e.g., 'github.com', 'stackoverflow.com')",
       },
       cache: {
         type: "string",
-        description: "View Google's cached version of a specific URL (e.g., 'example.com/page')"
+        description: "View Google's cached version of a specific URL (e.g., 'example.com/page')",
       },
       before: {
         type: "string",
-        description: "Date before in YYYY-MM-DD format (e.g., '2024-01-01')"
+        description: "Date before in YYYY-MM-DD format (e.g., '2024-01-01')",
       },
       after: {
         type: "string",
-        description: "Date after in YYYY-MM-DD format (e.g., '2023-01-01')"
+        description: "Date after in YYYY-MM-DD format (e.g., '2023-01-01')",
       },
       exact: {
         type: "string",
-        description: "Exact phrase match (e.g., 'machine learning', 'quantum computing')"
+        description: "Exact phrase match (e.g., 'machine learning', 'quantum computing')",
       },
       exclude: {
         type: "string",
-        description: "Terms to exclude from search results as comma-separated string (e.g., 'spam,ads', 'beginner,basic')"
+        description:
+          "Terms to exclude from search results as comma-separated string (e.g., 'spam,ads', 'beginner,basic')",
       },
       or: {
         type: "string",
-        description: "Alternative terms as comma-separated string (e.g., 'tutorial,guide,course', 'documentation,manual')"
-      }
+        description:
+          "Alternative terms as comma-separated string (e.g., 'tutorial,guide,course', 'documentation,manual')",
+      },
     },
-    required: ["q", "gl", "hl"],
-  };
+    required: ["q"],
+  }
 
   // Return list of tools with input schemas
   return {
@@ -161,8 +165,8 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
         },
       },
     ],
-  };
-});
+  }
+})
 
 /**
  * Handler for the webSearch tool.
@@ -191,20 +195,18 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         after,
         exact,
         exclude,
-        or
-      } = request.params.arguments || {};
+        or,
+      } = request.params.arguments || {}
 
-      if (!q || !gl || !hl) {
-        throw new Error(
-          "Search query and region code and language are required"
-        );
+      if (!q) {
+        throw new Error("Search query is required")
       }
 
       try {
         const result = await searchTools.search({
           q: String(q),
-          gl: String(gl),
-          hl: String(hl),
+          gl: gl ? String(gl) : "us",
+          hl: hl ? String(hl) : "en",
           location: location as string | undefined,
           num: num as number | undefined,
           tbs: tbs as "qdr:h" | "qdr:d" | "qdr:w" | "qdr:m" | "qdr:y" | undefined,
@@ -221,8 +223,8 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
           after: after as string | undefined,
           exact: exact as string | undefined,
           exclude: exclude as string | undefined,
-          or: or as string | undefined
-        });
+          or: or as string | undefined,
+        })
         return {
           content: [
             {
@@ -230,17 +232,16 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
               text: JSON.stringify(result, null, 2),
             },
           ],
-        };
+        }
       } catch (error) {
-        throw new Error(`Search failed: ${error}`);
+        throw new Error(`Search failed: ${error}`)
       }
     }
 
     case "scrape": {
-      const url = request.params.arguments?.url as string;
-      const includeMarkdown = request.params.arguments
-        ?.includeMarkdown as boolean;
-      const result = await searchTools.scrape({ url, includeMarkdown });
+      const url = request.params.arguments?.url as string
+      const includeMarkdown = request.params.arguments?.includeMarkdown as boolean
+      const result = await searchTools.scrape({ url, includeMarkdown })
       return {
         content: [
           {
@@ -248,33 +249,33 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
             text: JSON.stringify(result, null, 2),
           },
         ],
-      };
+      }
     }
 
     default:
-      throw new Error("Unknown tool");
+      throw new Error("Unknown tool")
   }
-});
+})
 
 // Handle prompts/list requests
 server.setRequestHandler(ListPromptsRequestSchema, async () => {
-  return prompts.listPrompts();
-});
+  return prompts.listPrompts()
+})
 
 // Handle prompts/get requests
 server.setRequestHandler(GetPromptRequestSchema, async (request) => {
-  return prompts.getPrompt(request.params.name, request.params.arguments || {});
-});
+  return prompts.getPrompt(request.params.name, request.params.arguments || {})
+})
 
 /**
  * Start the server using stdio transport.
  */
 async function main() {
-  const transport = new StdioServerTransport();
-  await server.connect(transport);
+  const transport = new StdioServerTransport()
+  await server.connect(transport)
 }
 
 main().catch((error) => {
-  console.error("Server error:", error);
-  process.exit(1);
-});
+  console.error("Server error:", error)
+  process.exit(1)
+})
